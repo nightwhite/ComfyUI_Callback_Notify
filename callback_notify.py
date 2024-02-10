@@ -17,6 +17,7 @@ class CallBack_Notify_Node:
         return {
             "required": {
                 "notify_url": ("STRING", {"default":"https://api.xxx.com/notify"}),
+                "task_id": ("STRING", {"default":"12345678"}),
                 "image": ("IMAGE", {"forceInput": True}),				
             },
         }
@@ -30,7 +31,7 @@ class CallBack_Notify_Node:
 
     CATEGORY = "image/callback"
 
-    def test(self, notify_url, image):
+    def test(self, task_id, notify_url, image):
         img = Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
         image_data = io.BytesIO()
         metadata = PngInfo()
@@ -38,7 +39,8 @@ class CallBack_Notify_Node:
         image_data_bytes = image_data.getvalue()
         encoded_image = "data:image/png;base64," + base64.b64encode(image_data_bytes).decode('utf-8')
         data = {
-            "image": encoded_image
+            "image": encoded_image,
+            "task_id": task_id,
         }
         json_data = json.dumps(data)
         headers = {
